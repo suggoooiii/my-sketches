@@ -3,9 +3,9 @@ const Random = require("canvas-sketch-util/random");
 const { mapRange } = require("canvas-sketch-util/math");
 const { clipPolylinesToBox } = require("canvas-sketch-util/geometry");
 
-const scale = 2;
+const scale = 4;
 
-const debug = false;
+const debug = true;
 const trace = true;
 
 /** function mapRange()return;
@@ -21,12 +21,12 @@ const trace = true;
 
 const settings = {
   dimensions: [800 * scale, 600 * scale],
-  scaleToView: true,
+  // scaleToView: true,
+  scaletToFit: true,
   animate: true,
   duration: 2,
-  playbackRate: "throttle",
+  playbackRate: "fixed",
   fps: 24,
-  debug: true,
 };
 
 const FREQUENCY = 0.001 / scale;
@@ -85,7 +85,7 @@ const sketch = () => {
       const lines = particles.map((particle) => particle.line);
       const clippedLines = clipPolylinesToBox(lines, clipBox, false, false);
 
-      context.lineWidth = 4;
+      context.lineWidth = 2;
       context.lineJoin = "round";
       context.lineCap = "round";
 
@@ -145,7 +145,9 @@ canvasSketch(sketch, settings);
  */
 function moveParticle(particle) {
   // Calculate direction from noise
-  const angle = Random.noise2D(particle.x, particle.y, FREQUENCY, AMPLITUDE);
+  // const angle = Random.noise2D(particle.x, particle.y, FREQUENCY, AMPLITUDE);
+  const angle =
+    simplex.noise2D(particle.x * FREQUENCY, particle.y * FREQUENCY) * AMPLITUDE;
 
   // Update the velocity of the particle
   // based on the direction
