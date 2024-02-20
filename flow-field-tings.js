@@ -1,38 +1,31 @@
 const canvasSketch = require("canvas-sketch");
 const Random = require("canvas-sketch-util/random");
+const lerp = require("lerp");
+const SimplexNoise = require("simplex-noise");
 const { mapRange } = require("canvas-sketch-util/math");
 const { clipPolylinesToBox } = require("canvas-sketch-util/geometry");
+const chroma = require("chroma-js");
+const { heading, calcVec, normalize } = require("./math");
 
-const scale = 4;
+const scale = 2;
 
-const debug = true;
+const debug = false;
 const trace = true;
-
-/** function mapRange()return;
- * Maps a value from one range to another.
- * @param {number} value - The value to map
- * @param {number} inputMin - Minimum value of the input range
- * @param {number} inputMax - Maximum value of the input range
- * @param {number} outputMin - Minimum value of the output range
- * @param {number} outputMax - Maximum value of the output range
- * @param {boolean} clamp - Whether to clamp the output value to the output range
- * @returns {number} The mapped value in the output range
- */
 
 const settings = {
   dimensions: [800 * scale, 600 * scale],
   // scaleToView: true,
   scaletToFit: true,
   animate: true,
-  duration: 2,
-  playbackRate: "fixed",
+  duration: 20,
+  playbackRate: "throttle",
   fps: 24,
 };
 
-const FREQUENCY = 0.001 / scale;
+const FREQUENCY = 0.01 / scale;
 const AMPLITUDE = 5;
 
-const PARTICLE_COUNT = debug ? 100 : 900;
+const PARTICLE_COUNT = debug ? 100 : 200;
 const DAMPING = 0.1;
 
 const STEP = 5 * scale;
@@ -114,21 +107,21 @@ const sketch = () => {
       }
 
       // Draw the flow field
-      // if (trace) {
-      //   for (let y = 0; y < height; y += 20) {
-      //     for (let x = 0; x < width; x += 20) {
-      //       const angle = Random.noise2D(x * FREQUENCY, y * FREQUENCY);
-      //       const length = 20;
-      //       const x2 = x + Math.cos(angle) * length;
-      //       const y2 = y + Math.sin(angle) * length;
-      //       context.strokeStyle = "rgba(255, 255, 255, 0.1)";
-      //       context.beginPath();
-      //       context.moveTo(x, y);
-      //       context.lineTo(x2, y2);
-      //       context.stroke();
-      //     }
-      //   }
-      // }
+      if (trace) {
+        for (let y = 0; y < height; y += 20) {
+          for (let x = 0; x < width; x += 20) {
+            const angle = Random.noise2D(x * FREQUENCY, y * FREQUENCY);
+            const length = 20;
+            const x2 = x + Math.cos(angle) * length;
+            const y2 = y + Math.sin(angle) * length;
+            context.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x2, y2);
+            context.stroke();
+          }
+        }
+      }
     },
   };
 };
@@ -146,8 +139,11 @@ canvasSketch(sketch, settings);
 function moveParticle(particle) {
   // Calculate direction from noise
   // const angle = Random.noise2D(particle.x, particle.y, FREQUENCY, AMPLITUDE);
-  const angle =
-    simplex.noise2D(particle.x * FREQUENCY, particle.y * FREQUENCY) * AMPLITUDE;
+  const angle = Random.noise2D(
+    particle.x * FREQUENCY,
+    particle.y * FREQUENCY,
+    AMPLITUDE
+  );
 
   // Update the velocity of the particle
   // based on the direction
