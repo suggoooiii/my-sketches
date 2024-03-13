@@ -1,24 +1,22 @@
 const canvasSketch = require("canvas-sketch");
 const Random = require("canvas-sketch-util/random");
-const lerp = require("lerp");
 const SimplexNoise = require("simplex-noise");
 const { mapRange } = require("canvas-sketch-util/math");
 const { clipPolylinesToBox } = require("canvas-sketch-util/geometry");
 const chroma = require("chroma-js");
 const { heading, calcVec, normalize } = require("./math");
 
-const scale = 2;
+const scale = 1;
 
-const debug = false;
+const debug = true;
 const trace = true;
 
 const settings = {
   dimensions: [800 * scale, 600 * scale],
-  // scaleToView: true,
-  scaletToFit: true,
+  // scaletToFit: true,
   animate: true,
   duration: 20,
-  playbackRate: "throttle",
+  // playbackRate: "throttle",
   fps: 24,
 };
 
